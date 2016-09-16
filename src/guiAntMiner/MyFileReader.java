@@ -41,7 +41,6 @@ public class MyFileReader {
 		List<String> attributesNameList = new ArrayList<String>();
 
 		attributesList = new ArrayList<String[]>();
-		List attributeValuesList = new ArrayList();
 
 		dataInstancesList = new ArrayList<int[]>();
 
@@ -55,7 +54,6 @@ public class MyFileReader {
 					} else if (s.toUpperCase().contains("ATTRIBUTE")) {
 						s = s.substring(s.indexOf(" ") + 1);
 						attributesNameList.add(s.substring(0, s.indexOf("{")).trim().replaceAll("'", ""));
-						attributeValuesList.clear();
 
 						s = s.substring(s.indexOf("{") + 1, s.indexOf("}"));
 						String[] v = s.split(",");
@@ -66,7 +64,7 @@ public class MyFileReader {
 						// convert attributesList to array
 						int x = 0;
 						attributesArray = new Attribute[attributesList.size()];
-						for (ListIterator i = attributesList.listIterator(); i.hasNext();) {
+						for (ListIterator<String[]> i = attributesList.listIterator(); i.hasNext();) {
 							Attribute attribute = new Attribute((String[]) i.next());
 							attribute.setAttributeName((String) attributesNameList.get(x));
 							attributesArray[x] = attribute;
@@ -79,7 +77,7 @@ public class MyFileReader {
 
 			dataInstancesArray = new DataInstance[dataInstancesList.size()];
 			int n = 0;
-			for (ListIterator i = dataInstancesList.listIterator(); i.hasNext();) {
+			for (ListIterator<int[]> i = dataInstancesList.listIterator(); i.hasNext();) {
 				DataInstance dataInstance = new DataInstance((int[]) i.next());
 				dataInstancesArray[n++] = dataInstance;
 			}

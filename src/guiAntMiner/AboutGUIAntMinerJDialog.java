@@ -118,7 +118,7 @@ public class AboutGUIAntMinerJDialog extends javax.swing.JDialog {
 				jLabel2 = new JLabel();
 				this.getContentPane().add(jLabel2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
 						GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0, 11, 0, 0), 0, 0));
-				jLabel2.setText("Version 1.2.1");
+				jLabel2.setText("Version 1.3");
 			}
 			{
 				jLabel1 = new JLabel();
@@ -161,7 +161,7 @@ public class AboutGUIAntMinerJDialog extends javax.swing.JDialog {
 				this.getContentPane().add(jLabel5, new GridBagConstraints(0, 6, 1, 1, 0.0, 0.0,
 						GridBagConstraints.NORTH, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 				jLabel5.setIcon(new ImageIcon(getClass().getClassLoader().getResource("resources/images/udesc_joinville.png")));
-				jLabel5.setToolTipText("State University of Santa Catarina, campus Joinville.");
+				jLabel5.setToolTipText("State University of Santa Catarina, campus Joinville, Brazil.");
 			}
 			{
 				jButton2 = new JButton();
@@ -177,7 +177,7 @@ public class AboutGUIAntMinerJDialog extends javax.swing.JDialog {
 				jButton2.setMaximumSize(new java.awt.Dimension(50, 9));
 				jButton2.setMinimumSize(new java.awt.Dimension(180, 14));
 				jButton2.setToolTipText(
-						"Website of the State University of Santa Catarina, campus Joinville. Available in Portuguese only.");
+						"Website of the State University of Santa Catarina, campus Joinville, Brazil.");
 				jButton2.addMouseListener(new MouseAdapter() {
 					public void mouseEntered(MouseEvent evt) {
 						setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -260,7 +260,7 @@ public class AboutGUIAntMinerJDialog extends javax.swing.JDialog {
 				jLabel3 = new JLabel();
 				this.getContentPane().add(jLabel3, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
 						GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0, 11, 0, 0), 0, 0));
-				jLabel3.setText("Developed by Fernando Meyer with supervision of Rafael Stubs Parpinelli.");
+				jLabel3.setText("Developed by Fernando Meyer. Initiated under supervision of Rafael Stubs Parpinelli.");
 			}
 			this.setSize(580, 386);
 		} catch (Exception e) {

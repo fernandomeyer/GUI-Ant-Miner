@@ -1,7 +1,6 @@
 package guiAntMiner;
 
 import java.awt.BorderLayout;
-import java.awt.Canvas;
 import java.awt.Cursor;
 import java.awt.Event;
 import java.awt.GridBagConstraints;
@@ -132,7 +131,7 @@ public class GUIAntMinerJFrame extends javax.swing.JFrame {
 	private JMenuItem jMenuItem2;
 	private JSeparator jSeparator1;
 	private MyFileReader myFileReader;
-	private Canvas canvas1;
+	private AttGraph canvas1;
 	private JTextField jTextField6;
 	private JLabel jLabel17;
 	private JButton jButton2;
@@ -148,6 +147,7 @@ public class GUIAntMinerJFrame extends javax.swing.JFrame {
 	private CrossValidation cv;
 	private Attribute[] attributesArray;
 	private DataInstance[] dataInstancesArray;
+	private int statsPerAttribute[][][];
 
 	/**
 	 * Auto-generated main method to display this JFrame
@@ -198,6 +198,7 @@ public class GUIAntMinerJFrame extends javax.swing.JFrame {
 									if (myFileReader.fileIsOk()) {
 										attributesArray = myFileReader.getAttributesArray();
 										dataInstancesArray = myFileReader.getDataInstancesArray();
+										initializeStatsPerAttribute();
 
 										setLabel2(myFileReader.getRelation());
 										jLabelNumberOfAttributes
@@ -205,6 +206,7 @@ public class GUIAntMinerJFrame extends javax.swing.JFrame {
 										jLabelNumberOfInstances.setText(String.valueOf(myFileReader.getInstancesNo()));
 										setTableAtt1(myFileReader.getAttributesArray());
 										jTabbedPane1.setEnabledAt(1, true);
+										canvas1.setStatsPerAttribute(statsPerAttribute);
 									}
 								}
 							}
@@ -273,7 +275,7 @@ public class GUIAntMinerJFrame extends javax.swing.JFrame {
 					{
 						jScrollPane1 = new JScrollPane();
 						jPanel2.add(jScrollPane1, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.NORTH,
-								GridBagConstraints.HORIZONTAL, new Insets(72, 5, 5, 2), 0, 0));
+								GridBagConstraints.BOTH, new Insets(72, 5, 5, 2), 0, 0));
 						jScrollPane1.setBounds(7, 80, 385, 200);
 						jScrollPane1.setBorder(BorderFactory.createTitledBorder("Attributes"));
 						jScrollPane1.setSize(364, 200);
@@ -431,7 +433,7 @@ public class GUIAntMinerJFrame extends javax.swing.JFrame {
 						BorderLayout jPanel4Layout = new BorderLayout();
 						jPanel4.setLayout(jPanel4Layout);
 						jPanel2.add(jPanel4, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.NORTH,
-								GridBagConstraints.HORIZONTAL, new Insets(263, 4, 5, 7), 0, 0));
+								GridBagConstraints.BOTH, new Insets(263, 4, 5, 7), 0, 0));
 						jPanel4.setBounds(398, 264, 381, 225);
 						jPanel4.setBorder(BorderFactory.createEtchedBorder(BevelBorder.LOWERED));
 						jPanel4.setMinimumSize(new java.awt.Dimension(10, 210));
@@ -771,8 +773,10 @@ public class GUIAntMinerJFrame extends javax.swing.JFrame {
 					// no rows are selected
 				} else {
 					int selectedRow = lsm.getMinSelectionIndex();
-					setTableAtt2(selectedRow, generateStats(selectedRow));
+					setTableAtt2(selectedRow, statsPerAttribute[selectedRow]);
 					jLabel8.setText(ar()[selectedRow].getAttributeName());
+					canvas1.setAttribute(selectedRow);
+					canvas1.repaint();
 
 					DecimalFormat myFormatter = new DecimalFormat("###.#");
 					jLabel10.setText(String.valueOf(calculateMissing(selectedRow)) + " (" + myFormatter.format(
@@ -790,11 +794,15 @@ public class GUIAntMinerJFrame extends javax.swing.JFrame {
 		return this.attributesArray;
 	}
 
-	public void setTableAtt2(int attributeIndex, int[] typesOccurences) {
+	public void setTableAtt2(int attributeIndex, int[][] typesOccurences) {
 		String labelAndCount[][] = new String[typesOccurences.length][2];
 		for (int n = 0; n < typesOccurences.length; n++) {
+			int sum = 0;
+			for (int i = 0; i < typesOccurences[n].length; i++) {
+				sum += typesOccurences[n][i];
+			}
 			labelAndCount[n][0] = attributesArray[attributeIndex].getTypes()[n];
-			labelAndCount[n][1] = new Integer(typesOccurences[n]).toString();
+			labelAndCount[n][1] = new Integer(sum).toString();
 		}
 		jTable2Model = new MyTableModel(labelAndCount, new String[] { "Attribute Value", "Quantity of Instances" });
 		jTable2 = new JTable();
@@ -904,25 +912,33 @@ public class GUIAntMinerJFrame extends javax.swing.JFrame {
 	}
 
 	/**
-	 * Determines the number of occurences of the attribute values in the
+	 * Determines the number of occurrences of the attribute values in the
 	 * dataset
 	 * 
 	 * @param attributePos
 	 * @return
 	 */
-	private int[] generateStats(int attributePos) {
-		int count;
-		int[] typesArray = (attributesArray[attributePos]).getIntTypesArray();
-		int[] returnArray = new int[typesArray.length];
-		for (int type = 0; type < typesArray.length; type++) {
-			count = 0;
-			for (int x2 = 0; x2 < dataInstancesArray.length; x2++) {
-				if (dataInstancesArray[x2].getValues()[attributePos] == type)
-					count++;
+	private void initializeStatsPerAttribute() {
+		int attArrayLength = attributesArray.length;
+		int lastAtt = attArrayLength - 1;
+		int numTypesOfLastAtt = (attributesArray[lastAtt]).getIntTypesArray().length;
+		statsPerAttribute = new int[attArrayLength][][];
+		
+		for (int attribute = 0; attribute < attArrayLength; attribute++) {
+			int numTypes = (attributesArray[attribute]).getIntTypesArray().length;
+			statsPerAttribute[attribute] = new int[numTypes][];
+			for (int type = 0; type < numTypes; type++) {
+				statsPerAttribute[attribute][type] = new int[numTypesOfLastAtt];
 			}
-			returnArray[type] = count;
 		}
-		return returnArray;
+		for (int i = 0; i < dataInstancesArray.length; i++) {
+			int[] value = dataInstancesArray[i].getValues();
+			for (int attribute = 0; attribute < attArrayLength; attribute++) {
+				if (value[attribute] != -1 && value[lastAtt] != -1) {
+					statsPerAttribute[attribute][value[attribute]][value[lastAtt]]++;
+				}
+			}
+		}
 	}
 
 }
